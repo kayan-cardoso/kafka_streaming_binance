@@ -43,6 +43,15 @@ services:
     depends_on:
       - kafka
 
+  binance-producer:
+    build:
+      context: .
+      dockerfile: src/producer/Dockerfile
+    container_name: binance-producer
+    depends_on:
+      - kafka
+    restart: unless-stopped
+
 
 volumes:
   kafka_data:
