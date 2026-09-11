@@ -23,7 +23,7 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
 
-      # Retenção
+      # Retenção 
       KAFKA_LOG_RETENTION_HOURS: 168
 
     volumes:
@@ -52,9 +52,91 @@ services:
       - kafka
     restart: unless-stopped
 
+  zookeeper-pinot:
+    image: zookeeper:3.9
+    container_name: zookeeper-pinot
+    restart: unless-stopped
+    ports: 
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    depends_on:
+      - kafka
+    volumes:
+      - zookeeper_pinot_data:/data
+      - zookeeper_pinot_datalog:/datalog
+    healthcheck:
+      test: ["CMD", "zkServer.sh", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+  pinot-controller:
+    image: apachepinot/pinot:1.5.1
+    container_name: pinot-controller
+    command: "StartController -zkAddress zookeeper-pinot:2181"
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      JAVA_OPTS: "-Xmx512M -Xms512M"
+    volumes:
+      - pinot_controller_data:/data
+    depends_on:
+      - zookeeper-pinot
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+  pinot-broker:
+    image: apachepinot/pinot:1.5.1
+    container_name: pinot-broker
+    command: "StartBroker -zkAddress zookeeper-pinot:2181"
+    restart: unless-stopped
+    ports:
+      - "8099:8099"
+    environment:
+      JAVA_OPTS: "-Xmx512M -Xms512M"
+    depends_on:
+      - pinot-controller
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8099/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+  pinot-server:
+    image: apachepinot/pinot:1.5.1
+    container_name: pinot-server
+    command: "StartServer -zkAddress zookeeper-pinot:2181"
+    restart: unless-stopped
+    ports:
+      - "8098:8098"
+    environment:
+      JAVA_OPTS: "-Xmx1G -Xms1G"
+    volumes:
+      - pinot_server_data:/data
+    depends_on:
+      - pinot-broker
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8097/health/readiness || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
 
 volumes:
   kafka_data:
- 
+  zookeeper_pinot_data:
+  zookeeper_pinot_datalog:
+  pinot_controller_data:
+  pinot_server_data:
 
 
