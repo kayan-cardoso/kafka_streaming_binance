@@ -1,0 +1,35 @@
+{
+  "tableName": "cotacoes_binance",
+  "tableType": "REALTIME",
+  "segmentsConfig": {
+    "schemaName": "cotacoes_binance",
+    "timeColumnName": "extract_ts",
+    "replication": "1",
+    "retentionTimeUnit": "DAYS",
+    "retentionTimeValue": "7"
+  },
+  "tenants": {},
+  "tableIndexConfig": {
+    "loadMode": "MMAP",
+    "streamConfigs": {
+      "streamType": "kafka",
+      "stream.kafka.topic.name": "cotacoes-binance",
+      "stream.kafka.broker.list": "kafka:9092",
+      "stream.kafka.consumer.type": "lowlevel",
+      "stream.kafka.consumer.prop.auto.offset.reset": "smallest",
+      "stream.kafka.consumer.factory.class.name": "org.apache.pinot.plugin.stream.kafka30.KafkaConsumerFactory",
+      "stream.kafka.decoder.class.name": "org.apache.pinot.plugin.inputformat.json.JSONMessageDecoder",
+      "realtime.segment.flush.threshold.rows": "50000",
+      "realtime.segment.flush.threshold.time": "1h"
+    }
+  },
+  "ingestionConfig": {
+    "transformConfigs": [
+      {
+        "columnName": "extract_ts",
+        "transformFunction": "fromDateTime(extract_date, 'yyyy-MM-dd''T''HH:mm:ss.SSSSSS')"
+      }
+    ]
+  },
+  "metadata": {}
+}

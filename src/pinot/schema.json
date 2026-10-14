@@ -1,0 +1,17 @@
+{
+    "schemaName": "cotacoes_binance",
+    "dimensionFieldSpecs": [
+        {"name": "cripto", "dataType": "STRING"}
+    ],
+    "metricFieldSpecs": [
+        {"name": "price", "dataType": "DOUBLE"}
+    ],
+    "dateTimeFieldSpecs": [
+        {
+            "name": "extract_ts",
+            "dataType": "TIMESTAMP",
+            "format": "1:MILLISECONDS:EPOCH",
+            "granularity": "1:MILLISECONDS"
+        }
+    ]
+}

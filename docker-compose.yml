@@ -131,6 +131,16 @@ services:
       retries: 5
       start_period: 10s
 
+  pinot-init:
+      image: curlimages/curl:latest
+      container_name: pinot-init
+      depends_on:
+        - pinot-controller
+        - pinot-server
+      volumes:
+        - ./src/pinot:/config:ro
+      entrypoint: ["sh", "/config/init.sh"]
+      restart: "no"
 
 volumes:
   kafka_data:
