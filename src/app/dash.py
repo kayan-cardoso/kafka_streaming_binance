@@ -21,7 +21,9 @@ STABLES = {"USDCUSDT", "FDUSDUSDT", "USD1USDT", "RLUSDUSDT", "UUSDT", "EURUSDT"}
 VERDE, VERMELHO, AZUL = "#2e9e5b", "#d64545", "#4c78a8"
 MARGEM = dict(l=0, r=0, t=40, b=0)
 
-st.set_page_config(page_title="Cotações Binance em tempo real", layout="wide")
+st.set_page_config(page_title="Cotações Binance em tempo real",
+                   layout="wide",
+                   page_icon='💹')
 
 
 @st.cache_resource
