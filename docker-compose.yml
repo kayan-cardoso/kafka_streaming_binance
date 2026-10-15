@@ -142,6 +142,20 @@ services:
       entrypoint: ["sh", "/config/init.sh"]
       restart: "no"
 
+  dashboard:
+    build:
+      context: .
+      dockerfile: src/app/Dockerfile
+    container_name: dashboard
+    ports:
+      - "8501:8501"
+    environment:
+      PINOT_BROKER_HOST: pinot-broker
+      PINOT_BROKER_PORT: "8099"
+    depends_on:
+      - pinot-broker
+    restart: unless-stopped
+
 volumes:
   kafka_data:
   zookeeper_pinot_data:
